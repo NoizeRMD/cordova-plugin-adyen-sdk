@@ -1,0 +1,59 @@
+{
+  "name": "cordova-plugin-adyen",
+  "version": "0.0.1",
+  "description": "Cordova plugin for Adyen Android and iOS SDK",
+  "cordova": {
+    "id": "cordova-plugin-adyen",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foodji/cordova-plugin-adyen.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android"
+  ],
+  "author": "foodji marketplace GmbH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/foodji/cordova-plugin-adyen/issues"
+  },
+  "homepage": "https://github.com/foodji/cordova-plugin-adyen#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^9.1.2",
+    "@commitlint/config-conventional": "^9.1.2",
+    "@foodji/cz-foodji-changelog": "0.0.2",
+    "husky": "^4.2.5",
+    "standard-version": "^9.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "standard-version": {
+    "packageFiles": [
+      "package.json"
+    ],
+    "bumpFiles": [
+      {
+        "filename": "package.json",
+        "type": "json"
+      },
+      {
+        "filename": "config.xml",
+        "updater": "cordova-version-updater.js"
+      }
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/@foodji/cz-foodji-changelog"
+    }
+  }
+}
