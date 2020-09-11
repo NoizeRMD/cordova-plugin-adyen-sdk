@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <title>Adyen SDK</title>
+</head>
+<body>
+<div class="app">
+  <h1>Adyen SDK</h1>
+  <div id="deviceready" class="blink">
+    <p class="event listening">Connecting to Device</p>
+    <p class="event received">Device is Ready</p>
+
+    <h2>API</h2>
+    <button ontouchstart="presentDropIn()">presentDropIn</button>
+    <br/><br/>
+
+  </div>
+</div>
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script>
+  function onSuccess(paymentMethod) {
+    console.log("onSuccess");
+    console.log("paymentMethod: " + JSON.stringify(paymentMethod));
+    alert("OK, paymentMethod: " + paymentMethod.type);
+  }
+
+  function onError(msg) {
+    console.log("Failed: " + msg);
+  }
+
+  function makePaymentDummy() {
+    return {
+      // TODO invalid data, asked Moritz for a good example
+      "action": {
+        "paymentData": "foo",
+        "paymentMethodType": "scheme",
+        "token": "morefoo",
+        "type": "threeDS2Fingerprint"
+      }
+    }
+  }
+
+  // AQEwhmfuXNWTK0Qc+iSWnWs8re22SZlGCIdaVGRVw1+mnE6ffj+3W/v4cQn4S2W/07UHEMFdWw2+5HzctViMSCJMYAc=-HeQs/TPsUh9586KSV6XYcw+pYhf8kqwq12Jr6eogpGA=-2X:3r%W(uhmZc<;5
+  function presentDropIn() {
+    if (window.Adyen) {
+      var options = {
+        paymentMethodsResponse: {"paymentMethods":[{"brands":["visa","mc","amex"],"details":[{"key":"encryptedCardNumber","type":"cardToken"},{"key":"encryptedSecurityCode","type":"cardToken"},{"key":"encryptedExpiryMonth","type":"cardToken"},{"key":"encryptedExpiryYear","type":"cardToken"},{"key":"holderName","optional":true,"type":"text"}],"name":"Kreditkarte","type":"scheme"},{"name":"Sofort.","supportsRecurring":true,"type":"directEbanking"},{"details":[{"key":"sepa.ownerName","type":"text"},{"key":"sepa.ibanNumber","type":"text"}],"name":"SEPA Lastschrift","supportsRecurring":true,"type":"sepadirectdebit"},{"name":"Rechnung mit Klarna.","supportsRecurring":true,"type":"klarna"},{"name":"Paysafecard","supportsRecurring":true,"type":"paysafecard"},{"details":[{"key":"bic","optional":true,"type":"text"}],"name":"GiroPay","supportsRecurring":true,"type":"giropay"},{"name":"Ratenkauf mit Klarna.","supportsRecurring":true,"type":"klarna_account"},{"details":[{"key":"applepay.token","type":"applePayToken"}],"name":"Apple Pay","supportsRecurring":true,"type":"applepay"},{"name":"Pay now with Klarna.","supportsRecurring":true,"type":"klarna_paynow"},{"details":[{"key":"paywithgoogle.token","type":"payWithGoogleToken"}],"name":"Google Pay","supportsRecurring":true,"type":"paywithgoogle"}]},
+        environment: "test", // or "live", default "test"
+        currencyCode: "EUR",
+        amount: 123, // in minor units (cents)
+        // TODO check contents
+        paymentMethodsConfiguration: {
+          card: {
+            hasHolderName: true,
+            holderNameRequired: true,
+            publicKey: "10001|A5CC0B567192DE5B987C0001CD1DB28E10235333767600162D34BEA9796DA17DD1C8CAFE3AA56F3EC476F92467489982F4492E55AA483FBDEFD75EB23332E22107C058BA2EF124EBE33B47B8679C4DE65B422E606A4A22CD6E8B3BBED1DDF916553D8C15827FF01E333589482CE0F0BA98D2ACAAE2F6875117CBDDE1032F10A98464CEAFBBF146F41F160760651A2789C759CE460CB3B770D4721E6F11847C9FA448B1399D9BD12E0C6F02A985B8FDAD175F669D17AA8A5EA6584C725CB761227926F51D583FA857B9227437EBD9A933D526100825CEED0E9D642823669E6AB3C22EE5871C4DBCD0EF450449F97DB2C718A34FF94B74F76C51F507C7344123D9"
+          },
+          applepay: {
+            amount: 0,
+            currencyCode: 'EUR',
+            countryCode: 'DE',
+            configuration: {
+              merchantName: 'foodji test merchant',
+              merchantIdentifier: 'merchant.com.adyen.foodji.test'
+            }
+          }
+        },
+
+        // onSubmit of the payment form the drop-in shows to the user
+        onSubmit: function (state) {
+          console.log("onSubmit, paymentMethods: " + JSON.stringify(state.data));
+          // Your function calling your server to make the `/payments` request
+          // (while this is processing, keep the drop-in open)
+
+          var fakeServerResponse = makePaymentDummy(state.data);
+
+          console.log("fakeServerResponse.action: " + fakeServerResponse.action);
+
+          if (fakeServerResponse.action) {
+            console.log("calling Adyen.handleAction");
+            console.log(JSON.stringify(fakeServerResponse.action));
+            // If the server response wants us to invoke an action, pass that to the drop-in.
+            // Note that the plugin will dismiss the drop-in control once the action has been handled by the user.
+            Adyen.handleAction(fakeServerResponse.action);
+          } else {
+            console.log("All OK, closing the drop-in");
+            Adyen.dismissDropIn();
+          }
+        },
+
+        onAdditionalDetails: function (state) {
+          console.log("onAdditionalDetails, state: " + state);
+          // Call your server here, no need to invoke the plugin anymore
+        }
+      };
+
+      Adyen.presentDropIn(options, onSuccess, onError);
+    }
+  }
+</script>
+</body>
+</html>

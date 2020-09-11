@@ -1,0 +1,28 @@
+{
+  "name": "cordova-plugin-adyen-sdk",
+  "version": "1.0.0",
+  "description": "Cordova plugin for the Adyen SDK",
+  "cordova": {
+    "id": "cordova-plugin-adyen-sdk",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foodji/cordova-plugin-adyen-sdk.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "Adyen"
+  ],
+  "author": "foodji marketplace GmbH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/foodji/cordova-plugin-adyen-sdk/issues"
+  },
+  "homepage": "https://github.com/foodji/cordova-plugin-adyen-sdk#readme"
+}

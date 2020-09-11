@@ -1,0 +1,4 @@
+dependencies {
+    implementation "com.adyen.checkout:drop-in:3.6.6"
+    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
+}

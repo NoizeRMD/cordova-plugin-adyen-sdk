@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<plugin
+    id="cordova-plugin-adyen-sdk"
+    version="1.0.0"
+    xmlns="http://apache.org/cordova/ns/plugins/1.0">
+
+  <name>Adyen SDK</name>
+
+  <author>foodji marketplace GmbH</author>
+
+  <description>Cordova plugin for the Adyen SDK</description>
+
+  <keywords>Adyen, Adyen SDK</keywords>
+
+  <license>MIT</license>
+
+  <engines>
+    <engine name="cordova" version=">=6.0.0"/>
+  </engines>
+
+  <js-module name="Adyen" src="www/Adyen.js">
+    <clobbers target="Adyen"/>
+  </js-module>
+
+  <platform name="android">
+
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+      <service
+          android:name="com.adyensdk.plugin.AdyenPluginDropInService"
+          android:permission="android.permission.BIND_JOB_SERVICE" />
+    </config-file>
+
+    <!-- for resuming the app after the Adyen drop-in dialog closes -->
+    <edit-config file="AndroidManifest.xml" target="/manifest/application/activity[@android:name='MainActivity']" mode="overwrite">
+      <activity android:launchMode="singleInstance" />
+    </edit-config>
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="AdyenPlugin">
+        <param name="android-package" value="com.adyensdk.plugin.AdyenPlugin" />
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+
+    <framework src="src/android/adyen-drop-in.gradle" custom="true" type="gradleReference" />
+
+    <source-file src="src/android/AdyenPlugin.java" target-dir="src/com/adyensdk/plugin"/>
+    <source-file src="src/android/AdyenPluginDropInService.java" target-dir="src/com/adyensdk/plugin"/>
+  </platform>
+
+  <platform name="ios">
+    <config-file parent="/*" target="config.xml">
+      <feature name="AdyenPlugin">
+        <param name="ios-package" value="AdyenPlugin"/>
+      </feature>
+    </config-file>
+
+    <dependency id="cordova-plugin-add-swift-support" version="2.0.2" />
+    <source-file src="src/ios/AdyenPlugin.swift" />
+
+    <podspec>
+      <config>
+        <source url="https://github.com/CocoaPods/Specs.git"/>
+      </config>
+      <pods use-frameworks="true">
+        <pod name="Adyen" spec="~> 3.6.0"/>
+      </pods>
+    </podspec>
+  </platform>
+
+</plugin>
