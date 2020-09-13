@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "install-plugin": "cd demo && cordova plugin remove cordova-plugin-adyen-sdk && rm -rf platforms plugins && cordova platform add ios android && cordova plugin add ../source && cd ..",
+    "install-plugin": "cd demo && rm -rf platforms plugins && npm i && cordova platform add ios android && cordova plugin add ../source --force && cd ..",
     "ios": "cd demo && cordova run ios",
     "android": "cd demo && cordova run android"
   }

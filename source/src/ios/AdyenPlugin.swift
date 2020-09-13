@@ -4,12 +4,12 @@ import Adyen
 @objc(AdyenPlugin)
 class AdyenPlugin: CDVPlugin {
     var command: CDVInvokedUrlCommand!
-    var dropInComponent: DropInComponent!;
-    var selectedPaymentMethod: PaymentMethodDetails!;
+    var dropInComponent: DropInComponent!
+    var selectedPaymentMethod: PaymentMethodDetails!
 
     @objc(presentDropIn:)
     func presentDropIn(command: CDVInvokedUrlCommand) {
-        self.selectedPaymentMethod = nil;
+        self.selectedPaymentMethod = nil
         self.command = command
         let obj: NSDictionary = command.arguments[0] as! NSDictionary
 
@@ -38,12 +38,10 @@ class AdyenPlugin: CDVPlugin {
 
     @objc(handleAction:)
     func handleAction(command: CDVInvokedUrlCommand) {
+        // note: not running in background, because fi. the "redirect" type needs to perform actions on the UI thread
         let actionStr: String = command.arguments[0] as! String
-
-        self.commandDelegate.run(inBackground: {
-            let action = (try? JSONDecoder().decode(Action.self, from: Data(actionStr.utf8)))!
-            self.dropInComponent.handle(action)
-        })
+        let action = (try? JSONDecoder().decode(Action.self, from: Data(actionStr.utf8)))!
+        self.dropInComponent.handle(action)
     }
 
     @objc(dismissDropIn:)
@@ -59,32 +57,24 @@ class AdyenPlugin: CDVPlugin {
 
 extension AdyenPlugin: DropInComponentDelegate {
     func didSubmit(_ data: PaymentComponentData, from component: DropInComponent) {
-        self.selectedPaymentMethod = data.paymentMethod;
+        self.selectedPaymentMethod = data.paymentMethod
         let result: [String: Any] = ["action": "onSubmit", "data": data.paymentMethod.dictionaryRepresentation]
-
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: result)
         pluginResult!.keepCallback = NSNumber(true)
-
-//             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"ready":@(YES)}];
-
-//             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-//             self.viewController.dismiss(animated: true)
         self.commandDelegate.send(pluginResult, callbackId:self.command.callbackId)
     }
 
     func didProvide(_ data: ActionComponentData, from component: DropInComponent) {
-        print("didProvide \(data)")
         DispatchQueue.main.async {
             self.viewController.dismiss(animated: true)
         }
-        // TODO return the relevant result as the client needs to send that to the server
-        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: data.paymentData)
-        self.commandDelegate.send(pluginResult, callbackId:command.callbackId)
+        let result: [String: Any] = ["action": "onAdditionalDetails", "data": data.paymentData]
+        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: result)
+        self.commandDelegate.send(pluginResult, callbackId:self.command.callbackId)
     }
 
     // also invoked when cancelled (the close icon was pressed)
     func didFail(with error: Error, from component: DropInComponent) {
-        print("didFail: \(error), " + error.localizedDescription)
         DispatchQueue.main.async {
             self.viewController.dismiss(animated: true)
         }

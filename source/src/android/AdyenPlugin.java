@@ -7,6 +7,7 @@ import com.adyen.checkout.base.model.payments.Amount;
 import com.adyen.checkout.core.api.Environment;
 import com.adyen.checkout.dropin.DropIn;
 import com.adyen.checkout.dropin.DropInConfiguration;
+import com.adyen.checkout.dropin.service.CallResult;
 import com.adyen.checkout.sepa.SepaConfiguration;
 
 import org.apache.cordova.*;
@@ -16,6 +17,8 @@ import org.json.JSONObject;
 public class AdyenPlugin extends CordovaPlugin {
 
   private static final String ACTION_PRESENT_DROP_IN = "presentDropIn";
+  private static final String ACTION_HANDLE_ACTION = "handleAction";
+  private static final String ACTION_DISMISS_DROP_IN = "dismissDropIn";
 
   private static final String INTENT_ACTION_PRESENTDROPIN = "INTENT_ACTION_PRESENTDROPIN";
 
@@ -26,6 +29,12 @@ public class AdyenPlugin extends CordovaPlugin {
     if (ACTION_PRESENT_DROP_IN.equals(action)) {
       presentDropIn(args, callbackContext);
       return true;
+    } else if (ACTION_HANDLE_ACTION.equals(action)) {
+      handleAction(args);
+      return true;
+    } else if (ACTION_DISMISS_DROP_IN.equals(action)) {
+      dismissDropIn();
+      return true;
     } else {
       return false;
     }
@@ -35,26 +44,28 @@ public class AdyenPlugin extends CordovaPlugin {
     cordova.getThreadPool().execute(() -> {
       try {
         this.callbackContext = callbackContext;
+        AdyenPluginDropInService.callbackContext = callbackContext;
+        AdyenPluginDropInService.lastPaymentMethod = null;
         JSONObject options = args.getJSONObject(0);
         String environment = options.optString("environment", "test");
-        int amountInCents = options.getInt("amountInCents");
-        String currency = options.getString("currency");
+        int amount = options.getInt("amount");
+        String currencyCode = options.getString("currencyCode");
         String paymentMethodsResponse = options.getString("paymentMethodsResponse");
-        String clientKey = options.getString("clientKey");
+        JSONObject paymentMethodsConfiguration = options.getJSONObject("paymentMethodsConfiguration");
 
-        JSONObject json = new JSONObject(paymentMethodsResponse);
-        PaymentMethodsApiResponse paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(json);
+        PaymentMethodsApiResponse paymentMethodsApiResponse = PaymentMethodsApiResponse.SERIALIZER.deserialize(new JSONObject(paymentMethodsResponse));
 
         Intent intent = new Intent(cordova.getContext(), cordova.getActivity().getClass());
-        intent.setAction("bla");
-//        intent.setClassName("com.adyensdk.plugin", "AdyenPlugin");
+        intent.setAction(INTENT_ACTION_PRESENTDROPIN);
 
         DropInConfiguration.Builder dropInConfigurationBuilder = new DropInConfiguration.Builder(cordova.getContext(), intent, AdyenPluginDropInService.class);
         dropInConfigurationBuilder.addSepaConfiguration(new SepaConfiguration.Builder(cordova.getContext()).build());
-        Amount amount = new Amount();
-        amount.setCurrency(currency);
-        amount.setValue(amountInCents);
-        dropInConfigurationBuilder.setAmount(amount);
+
+        Amount dropInAmount = new Amount();
+        dropInAmount.setCurrency(currencyCode);
+        dropInAmount.setValue(amount);
+        dropInConfigurationBuilder.setAmount(dropInAmount);
+
         dropInConfigurationBuilder.setEnvironment("live".equals(environment) ? Environment.EUROPE : Environment.TEST);
         DropInConfiguration dropInConfiguration = dropInConfigurationBuilder.build();
 
@@ -66,13 +77,40 @@ public class AdyenPlugin extends CordovaPlugin {
     });
   }
 
-  // TODO ff code van Moritz bekijken wat hun flow is..
-  // TODO (documenteer / forceer vanuit plugin) dit wordt alleen aangeroepen als in AndroidManifest.xml dit op de activity staat: android:launchMode="singleInstance"
+  private void handleAction(CordovaArgs args) {
+    cordova.getThreadPool().execute(() -> {
+      try {
+        String action = args.getString(0);
+        AdyenPluginDropInService.getInstance().callResultAction(action);
+      } catch (JSONException e) {
+        callbackContext.error(e.getMessage());
+      }
+    });
+  }
+
+  private void dismissDropIn() {
+    AdyenPluginDropInService.getInstance().callResultFinished();
+  }
+
+  // Note this is only invoked if in AndroidManifest.xml this is added to the activity: android:launchMode="singleInstance".
+  // If that's a problem, then ignore this intent and move the callback stuff to AdyenPluginDropInService.callResultFinished.
   public void onNewIntent(Intent intent) {
     super.onNewIntent(intent);
+    System.out.println("ignoring intent - already handled by our service class");
+    /*
     if (INTENT_ACTION_PRESENTDROPIN.equals(intent.getAction())) {
-      callbackContext.success();
+      String paymentMethod = intent.getStringExtra(DropIn.RESULT_KEY);
+      if (paymentMethod == null) {
+        callbackContext.success();
+      } else {
+        try {
+          callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, new JSONObject(paymentMethod)));
+        } catch (JSONException e) {
+          callbackContext.error("Error in AdyenPlugin.onNewIntent: " + e.getMessage());
+        }
+      }
     }
+    */
   }
 
   @Override

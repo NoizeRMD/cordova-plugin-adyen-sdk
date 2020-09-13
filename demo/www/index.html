@@ -22,8 +22,7 @@
 <script type="text/javascript" src="js/index.js"></script>
 <script>
   function onSuccess(paymentMethod) {
-    console.log("onSuccess");
-    console.log("paymentMethod: " + JSON.stringify(paymentMethod));
+    console.log("onSuccess, paymentMethod: " + JSON.stringify(paymentMethod));
     alert("OK, paymentMethod: " + paymentMethod.type);
   }
 
@@ -32,14 +31,21 @@
   }
 
   function makePaymentDummy() {
-    return {
-      // TODO invalid data, asked Moritz for a good example
-      "action": {
-        "paymentData": "foo",
-        "paymentMethodType": "scheme",
-        "token": "morefoo",
-        "type": "threeDS2Fingerprint"
+    var returnAction = false;
+
+    if (returnAction) {
+      // note that this action is probably incorrect because of expired tokens and whatnot
+      return {
+        "action": {
+          "paymentData": "Ab02b4c0!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",
+          "paymentMethodType": "scheme",
+          "token": "eyJ0aHJlZURTTWV0aG9kTm90aWZpY2F0aW9uVVJMIjoiaHR0cHM6XC9cL2NoZWNrb3V0c2hvcHBlci10ZXN0LmFkeWVuLmNvbVwvY2hlY2tvdXRzaG9wcGVyXC90aHJlZURTTWV0aG9kTm90aWZpY2F0aW9uLnNodG1sP29yaWdpbktleT1wdWIudjIuODAxNTkzMDc1MzMyMzEzMy5hSFIwY0RvdkwyeHZZMkZzYUc5emREbzVNREF3LkpqU1VnTS1COWJBcURETmFJS3kwR24tSFkyTFA2MURabndpQUtGajRyRWsiLCJ0aHJlZURTTWV0aG9kVXJsIjoiaHR0cHM6XC9cL3BhbC10ZXN0LmFkeWVuLmNvbVwvdGhyZWVkczJzaW11bGF0b3JcL2Fjc1wvc3RhcnRNZXRob2Quc2h0bWwiLCJ0aHJlZURTU2VydmVyVHJhbnNJRCI6IjRjM2MyYmNjLTM1NTItNGJkOS04N2NhLWQ1YzExNzlhZGRmYSJ9",
+          "type": "threeDS2Fingerprint",
+          "url": "https://www.nu.nl"
+        }
       }
+    } else {
+      return {};
     }
   }
 
@@ -51,7 +57,7 @@
         environment: "test", // or "live", default "test"
         currencyCode: "EUR",
         amount: 123, // in minor units (cents)
-        // TODO check contents
+        // note that this element is currently ignored
         paymentMethodsConfiguration: {
           card: {
             hasHolderName: true,
@@ -69,19 +75,16 @@
           }
         },
 
-        // onSubmit of the payment form the drop-in shows to the user
         onSubmit: function (state) {
           console.log("onSubmit, paymentMethods: " + JSON.stringify(state.data));
           // Your function calling your server to make the `/payments` request
           // (while this is processing, keep the drop-in open)
 
+          // simulating a server call here
           var fakeServerResponse = makePaymentDummy(state.data);
 
-          console.log("fakeServerResponse.action: " + fakeServerResponse.action);
-
           if (fakeServerResponse.action) {
-            console.log("calling Adyen.handleAction");
-            console.log(JSON.stringify(fakeServerResponse.action));
+            console.log("calling Adyen.handleAction with payload: " + JSON.stringify(fakeServerResponse.action));
             // If the server response wants us to invoke an action, pass that to the drop-in.
             // Note that the plugin will dismiss the drop-in control once the action has been handled by the user.
             Adyen.handleAction(fakeServerResponse.action);
@@ -92,7 +95,7 @@
         },
 
         onAdditionalDetails: function (state) {
-          console.log("onAdditionalDetails, state: " + state);
+          console.log("onAdditionalDetails, state: " + JSON.stringify(state));
           // Call your server here, no need to invoke the plugin anymore
         }
       };

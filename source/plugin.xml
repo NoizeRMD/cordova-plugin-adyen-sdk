@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <plugin
     id="cordova-plugin-adyen-sdk"
-    version="1.0.0"
+    version="0.1.0"
     xmlns="http://apache.org/cordova/ns/plugins/1.0">
 
   <name>Adyen SDK</name>
@@ -29,11 +29,6 @@
           android:name="com.adyensdk.plugin.AdyenPluginDropInService"
           android:permission="android.permission.BIND_JOB_SERVICE" />
     </config-file>
-
-    <!-- for resuming the app after the Adyen drop-in dialog closes -->
-    <edit-config file="AndroidManifest.xml" target="/manifest/application/activity[@android:name='MainActivity']" mode="overwrite">
-      <activity android:launchMode="singleInstance" />
-    </edit-config>
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="AdyenPlugin">
