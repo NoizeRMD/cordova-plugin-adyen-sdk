@@ -4,6 +4,7 @@ var Adyen = function () {
 };
 
 Adyen.prototype.presentDropIn = function (options, onSuccess, onFail) {
+  console.log('PRESENT DROP IN CALLED', options);
   var opts = options || {};
 
   // we need this as a string, not as an object

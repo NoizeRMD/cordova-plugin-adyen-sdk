@@ -5,11 +5,11 @@ import Adyen
 class AdyenPlugin: CDVPlugin {
     var command: CDVInvokedUrlCommand!
     var dropInComponent: DropInComponent!
-    var selectedPaymentMethod: PaymentMethodDetails!
+    var lastPaymentResponse: PaymentMethodDetails!
 
     @objc(presentDropIn:)
     func presentDropIn(command: CDVInvokedUrlCommand) {
-        self.selectedPaymentMethod = nil
+        self.lastPaymentResponse = nil
         self.command = command
         let obj: NSDictionary = command.arguments[0] as! NSDictionary
 
@@ -47,18 +47,18 @@ class AdyenPlugin: CDVPlugin {
     @objc(dismissDropIn:)
     func dismissDropIn(command: CDVInvokedUrlCommand) {
         self.viewController.dismiss(animated: true)
-        if (self.selectedPaymentMethod == nil) {
+        if (self.lastPaymentResponse == nil) {
             self.commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_OK), callbackId:self.command.callbackId)
         } else {
-            self.commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_OK, messageAs: self.selectedPaymentMethod.dictionaryRepresentation), callbackId:self.command.callbackId)
+            self.commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_OK, messageAs: self.lastPaymentResponse.dictionaryRepresentation), callbackId:self.command.callbackId)
         }
     }
 }
 
 extension AdyenPlugin: DropInComponentDelegate {
     func didSubmit(_ data: PaymentComponentData, from component: DropInComponent) {
-        self.selectedPaymentMethod = data.paymentMethod
-        let result: [String: Any] = ["action": "onSubmit", "data": data.paymentMethod.dictionaryRepresentation]
+        self.lastPaymentResponse = data
+        let result: [String: Any] = ["action": "onSubmit", "data": self.lastPaymentResponse.dictionaryRepresentation]
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: result)
         pluginResult!.keepCallback = NSNumber(true)
         self.commandDelegate.send(pluginResult, callbackId:self.command.callbackId)

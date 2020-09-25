@@ -45,7 +45,7 @@ public class AdyenPlugin extends CordovaPlugin {
       try {
         this.callbackContext = callbackContext;
         AdyenPluginDropInService.callbackContext = callbackContext;
-        AdyenPluginDropInService.lastPaymentMethod = null;
+        AdyenPluginDropInService.lastPaymentResponse = null;
         JSONObject options = args.getJSONObject(0);
         String environment = options.optString("environment", "test");
         int amount = options.getInt("amount");

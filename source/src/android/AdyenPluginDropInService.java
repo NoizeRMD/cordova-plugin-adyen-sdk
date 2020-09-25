@@ -13,7 +13,7 @@ import org.json.JSONException;
  * but we want to have our JS client invoke the backend, so we need to pass control back to JS.
  */
 public class AdyenPluginDropInService extends DropInService {
-  public static JSONObject lastPaymentMethod;
+  public static JSONObject lastPaymentResponse;
   public static CallbackContext callbackContext;
   private static AdyenPluginDropInService INSTANCE;
 
@@ -44,18 +44,18 @@ public class AdyenPluginDropInService extends DropInService {
       callbackContext.error("Error in AdyenPluginDropInService.makePaymentsCall: " + e.getMessage());
     }
 
-    return new CallResult(CallResult.ResultType.FINISHED, lastPaymentMethod == null ? "" : lastPaymentMethod.toString());
+    return new CallResult(CallResult.ResultType.FINISHED, lastPaymentResponse == null ? "" : lastPaymentResponse.toString());
   }
 
   @Override
   public CallResult makePaymentsCall(JSONObject jsonObject) {
     // this is called after the user picked one of the payment methods from the list
     try {
-      lastPaymentMethod = jsonObject.getJSONObject("paymentMethod");
+      lastPaymentResponse = jsonObject;
 
       JSONObject result = new JSONObject();
       result.put("action", "onSubmit");
-      result.put("data", lastPaymentMethod);
+      result.put("data", lastPaymentResponse);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
       pluginResult.setKeepCallback(true);
       callbackContext.sendPluginResult(pluginResult);
@@ -71,13 +71,13 @@ public class AdyenPluginDropInService extends DropInService {
     // Note that the content here is send as the RESULT_KEY in the intent, so we could use that in AdyenPlugin.java,
     // however, that would require AndroidManifest.xml need this to be added o the activity: android:launchMode="singleInstance"
     // because otherwise onNewIntent in AdyenPlugin.java won't fire. So doing it here is more robust.
-    asyncCallback(new CallResult(CallResult.ResultType.FINISHED, lastPaymentMethod.toString()));
-    if (lastPaymentMethod == null) {
+    asyncCallback(new CallResult(CallResult.ResultType.FINISHED, lastPaymentResponse.toString()));
+    if (lastPaymentResponse == null) {
       callbackContext.success();
     } else {
       try {
         JSONObject result = new JSONObject();
-        result.put("data", lastPaymentMethod);
+        result.put("data", lastPaymentResponse);
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, result));
 
       } catch (JSONException e) {
