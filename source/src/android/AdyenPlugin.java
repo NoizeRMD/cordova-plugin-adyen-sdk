@@ -4,10 +4,12 @@ import android.content.Intent;
 
 import com.adyen.checkout.base.model.PaymentMethodsApiResponse;
 import com.adyen.checkout.base.model.payments.Amount;
+import com.adyen.checkout.card.CardConfiguration;
 import com.adyen.checkout.core.api.Environment;
 import com.adyen.checkout.dropin.DropIn;
 import com.adyen.checkout.dropin.DropInConfiguration;
 import com.adyen.checkout.dropin.service.CallResult;
+import com.adyen.checkout.googlepay.GooglePayConfiguration;
 import com.adyen.checkout.sepa.SepaConfiguration;
 
 import org.apache.cordova.*;
@@ -60,6 +62,21 @@ public class AdyenPlugin extends CordovaPlugin {
 
         DropInConfiguration.Builder dropInConfigurationBuilder = new DropInConfiguration.Builder(cordova.getContext(), intent, AdyenPluginDropInService.class);
         dropInConfigurationBuilder.addSepaConfiguration(new SepaConfiguration.Builder(cordova.getContext()).build());
+
+        if (paymentMethodsConfiguration.has("card")) {
+          CardConfiguration cardConfiguration = new CardConfiguration.Builder(cordova.getContext(), paymentMethodsConfiguration.getJSONObject("card").getString("publicKey"))
+              .setHolderNameRequire(paymentMethodsConfiguration.getJSONObject("card").getBoolean("holderNameRequired"))
+              .setShowStorePaymentField(paymentMethodsConfiguration.getJSONObject("card").getBoolean("showStorePaymentField"))
+              .build();
+          dropInConfigurationBuilder.addCardConfiguration(cardConfiguration);
+        }
+
+        if (paymentMethodsConfiguration.has("paywithgoogle")) {
+          GooglePayConfiguration googlePayConfiguration = new GooglePayConfiguration.Builder(cordova.getContext(), paymentMethodsConfiguration.getJSONObject("paywithgoogle").getJSONObject("configuration").getString("gatewayMerchantId"))
+              .setEnvironment(Environment.TEST) // TODO: replace with actual environment
+              .build();
+          dropInConfigurationBuilder.addGooglePayConfiguration(googlePayConfiguration);
+        }
 
         Amount dropInAmount = new Amount();
         dropInAmount.setCurrency(currencyCode);
