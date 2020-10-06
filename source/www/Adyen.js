@@ -34,7 +34,7 @@ Adyen.prototype.presentDropIn = function (options, onSuccess, onFail) {
 };
 
 Adyen.prototype.handleAction = function (options) {
-  console.log(">> handle action, options: " + options);
+  console.log(">> handle action, options: ", options);
 
   // we need this as a string, not as an object
   if (typeof options !== "string") {
