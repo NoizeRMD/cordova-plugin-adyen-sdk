@@ -44,7 +44,7 @@ public class AdyenPluginDropInService extends DropInService {
       callbackContext.error("Error in AdyenPluginDropInService.makeDetailsCall: " + e.getMessage());
     }
 
-    return new CallResult(CallResult.ResultType.FINISHED, lastPaymentResponse == null ? "" : lastPaymentResponse.toString());
+    return new CallResult(CallResult.ResultType.WAIT, "Handled in JS, will complete async");
   }
 
   @Override
