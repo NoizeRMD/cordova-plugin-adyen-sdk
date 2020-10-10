@@ -32,7 +32,7 @@ public class AdyenPluginDropInService extends DropInService {
     // this is called after the "action" (for additional details) completes
 
     try {
-      JSONObject actionComponentData = jsonObject.getJSONObject("actionComponentData");
+      JSONObject actionComponentData = jsonObject;
 
       JSONObject result = new JSONObject();
       result.put("action", "onAdditionalDetails");
@@ -41,7 +41,7 @@ public class AdyenPluginDropInService extends DropInService {
       callbackContext.sendPluginResult(pluginResult);
 
     } catch (JSONException e) {
-      callbackContext.error("Error in AdyenPluginDropInService.makePaymentsCall: " + e.getMessage());
+      callbackContext.error("Error in AdyenPluginDropInService.makeDetailsCall: " + e.getMessage());
     }
 
     return new CallResult(CallResult.ResultType.FINISHED, lastPaymentResponse == null ? "" : lastPaymentResponse.toString());
