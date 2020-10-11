@@ -38,6 +38,7 @@ public class AdyenPluginDropInService extends DropInService {
       result.put("action", "onAdditionalDetails");
       result.put("data", actionComponentData);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
+      pluginResult.setKeepCallback(true);
       callbackContext.sendPluginResult(pluginResult);
 
     } catch (JSONException e) {
