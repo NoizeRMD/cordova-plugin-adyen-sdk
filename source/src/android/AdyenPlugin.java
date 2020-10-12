@@ -73,7 +73,7 @@ public class AdyenPlugin extends CordovaPlugin {
 
         if (paymentMethodsConfiguration.has("paywithgoogle")) {
           GooglePayConfiguration googlePayConfiguration = new GooglePayConfiguration.Builder(cordova.getContext(), paymentMethodsConfiguration.getJSONObject("paywithgoogle").getJSONObject("configuration").getString("gatewayMerchantId"))
-              .setEnvironment(Environment.TEST) // TODO: replace with actual environment
+              .setEnvironment("live".equals(environment) ? Environment.EUROPE : Environment.TEST)
               .build();
           dropInConfigurationBuilder.addGooglePayConfiguration(googlePayConfiguration);
         }
