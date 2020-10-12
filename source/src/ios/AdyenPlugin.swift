@@ -14,14 +14,30 @@ class AdyenPlugin: CDVPlugin {
         let obj: NSDictionary = command.arguments[0] as! NSDictionary
 
         let environment: String = obj["environment"] as? String ?? "test"
-//        let clientKey: String = obj["clientKey"] as! String
         let paymentMethodsResponse: String = obj["paymentMethodsResponse"] as! String
         let currencyCode: String = obj["currencyCode"] as! String
         let amount: Int = obj["amount"] as! Int
 
         self.commandDelegate.run(inBackground: {
             let configuration = DropInComponent.PaymentMethodsConfiguration()
-//            configuration.card.publicKey = clientKey
+
+            let paymentMethodsConfiguration: NSDictionary = obj["paymentMethodsConfiguration"] as! NSDictionary
+
+            let card = paymentMethodsConfiguration["card"] as? NSDictionary
+            if (card != nil) {
+                configuration.card.publicKey = card!["publicKey"] as? String
+                configuration.card.showsHolderNameField = card!["holderNameRequired"] as? Bool ?? false
+                configuration.card.showsStorePaymentMethodField = card!["showStorePaymentField"] as? Bool ?? true
+            }
+
+            let applePay = paymentMethodsConfiguration["applepay"] as? NSDictionary
+            if (applePay != nil) {
+                let applePayConfig = applePay!["configuration"] as? NSDictionary
+                if (applePayConfig != nil) {
+                    configuration.applePay.merchantIdentifier = applePayConfig!["merchantIdentifier"] as? String
+                }
+            }
+
             let paymentMethods = (try? JSONDecoder().decode(PaymentMethods.self, from: Data(paymentMethodsResponse.utf8) ))!
 
             self.dropInComponent = DropInComponent(paymentMethods: paymentMethods, paymentMethodsConfiguration: configuration)
@@ -57,7 +73,7 @@ class AdyenPlugin: CDVPlugin {
 
 extension AdyenPlugin: DropInComponentDelegate {
     func didSubmit(_ data: PaymentComponentData, from component: DropInComponent) {
-        self.lastPaymentResponse = data
+        self.lastPaymentResponse = data.paymentMethod
         let result: [String: Any] = ["action": "onSubmit", "data": self.lastPaymentResponse.dictionaryRepresentation]
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: result)
         pluginResult!.keepCallback = NSNumber(true)
@@ -70,6 +86,7 @@ extension AdyenPlugin: DropInComponentDelegate {
         }
         let result: [String: Any] = ["action": "onAdditionalDetails", "data": data.paymentData]
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: result)
+        pluginResult!.keepCallback = NSNumber(true)
         self.commandDelegate.send(pluginResult, callbackId:self.command.callbackId)
     }
 
