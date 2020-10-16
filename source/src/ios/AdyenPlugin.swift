@@ -5,7 +5,7 @@ import Adyen
 class AdyenPlugin: CDVPlugin {
     var command: CDVInvokedUrlCommand!
     var dropInComponent: DropInComponent!
-    var lastPaymentResponse: PaymentMethodDetails!
+    var lastPaymentResponse: PaymentComponentData!
 
     @objc(presentDropIn:)
     func presentDropIn(command: CDVInvokedUrlCommand) {
@@ -66,15 +66,15 @@ class AdyenPlugin: CDVPlugin {
         if (self.lastPaymentResponse == nil) {
             self.commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_OK), callbackId:self.command.callbackId)
         } else {
-            self.commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_OK, messageAs: self.lastPaymentResponse.dictionaryRepresentation), callbackId:self.command.callbackId)
+            self.commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_OK, messageAs: ["paymentMethod": self.lastPaymentResponse.paymentMethod.dictionaryRepresentation]), callbackId:self.command.callbackId)
         }
     }
 }
 
 extension AdyenPlugin: DropInComponentDelegate {
     func didSubmit(_ data: PaymentComponentData, from component: DropInComponent) {
-        self.lastPaymentResponse = data.paymentMethod
-        let result: [String: Any] = ["action": "onSubmit", "data": self.lastPaymentResponse.dictionaryRepresentation]
+        self.lastPaymentResponse = data
+        let result: [String: Any] = ["action": "onSubmit", "data": ["paymentMethod": self.lastPaymentResponse.paymentMethod.dictionaryRepresentation, "storePaymentMethod": self.lastPaymentResponse.storePaymentMethod, "browserInfo": ["userAgent": self.lastPaymentResponse.browserInfo?.userAgent]]]
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: result)
         pluginResult!.keepCallback = NSNumber(true)
         self.commandDelegate.send(pluginResult, callbackId:self.command.callbackId)
@@ -84,7 +84,7 @@ extension AdyenPlugin: DropInComponentDelegate {
         DispatchQueue.main.async {
             self.viewController.dismiss(animated: true)
         }
-        let result: [String: Any] = ["action": "onAdditionalDetails", "data": data.paymentData]
+        let result: [String: Any] = ["action": "onAdditionalDetails", "data": ["paymentData": data.paymentData, "details": data.details.dictionaryRepresentation]]
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: result)
         pluginResult!.keepCallback = NSNumber(true)
         self.commandDelegate.send(pluginResult, callbackId:self.command.callbackId)
