@@ -1,4 +1,5 @@
 import Adyen
+import PassKit
 
 // see https://docs.adyen.com/checkout/ios/drop-in
 @objc(AdyenPlugin)
@@ -17,6 +18,7 @@ class AdyenPlugin: CDVPlugin {
         let paymentMethodsResponse: String = obj["paymentMethodsResponse"] as! String
         let currencyCode: String = obj["currencyCode"] as! String
         let amount: Int = obj["amount"] as! Int
+        var countryCode: String = "DE";
 
         self.commandDelegate.run(inBackground: {
             let configuration = DropInComponent.PaymentMethodsConfiguration()
@@ -32,9 +34,13 @@ class AdyenPlugin: CDVPlugin {
 
             let applePay = paymentMethodsConfiguration["applepay"] as? NSDictionary
             if (applePay != nil) {
+                countryCode = applePay!["countryCode"] as! String
                 let applePayConfig = applePay!["configuration"] as? NSDictionary
                 if (applePayConfig != nil) {
                     configuration.applePay.merchantIdentifier = applePayConfig!["merchantIdentifier"] as? String
+                    configuration.applePay.summaryItems = [
+                        PKPaymentSummaryItem(label: applePayConfig!["merchantName"] as! String, amount: NSDecimalNumber(string: "0.0"), type: .pending)
+                    ]
                 }
             }
 
@@ -44,7 +50,7 @@ class AdyenPlugin: CDVPlugin {
             self.dropInComponent.delegate = self
             self.dropInComponent.environment = "live".elementsEqual(environment) ? .live : .test
             // amount in cents
-            self.dropInComponent.payment = Payment(amount: Payment.Amount(value: amount, currencyCode: currencyCode))
+            self.dropInComponent.payment = Payment(amount: Payment.Amount(value: amount, currencyCode: currencyCode), countryCode: countryCode)
 
             DispatchQueue.main.async {
                 self.viewController.present(self.dropInComponent.viewController, animated: true)
