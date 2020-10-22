@@ -41,6 +41,11 @@
 
     <source-file src="src/android/AdyenPlugin.java" target-dir="src/com/adyensdk/plugin"/>
     <source-file src="src/android/AdyenPluginDropInService.java" target-dir="src/com/adyensdk/plugin"/>
+
+    <resource-file src="res/values/attrs.xml" target="res/values/attrs.xml" />
+    <resource-file src="res/values/colors.xml" target="res/values/colors.xml" />
+    <resource-file src="res/values/dimens.xml" target="res/values/dimens.xml" />
+    <resource-file src="res/values/styles.xml" target="res/values/styles.xml" />
   </platform>
 
   <platform name="ios">
