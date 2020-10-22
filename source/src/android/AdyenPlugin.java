@@ -78,10 +78,12 @@ public class AdyenPlugin extends CordovaPlugin {
           dropInConfigurationBuilder.addGooglePayConfiguration(googlePayConfiguration);
         }
 
-        Amount dropInAmount = new Amount();
-        dropInAmount.setCurrency(currencyCode);
-        dropInAmount.setValue(amount);
-        dropInConfigurationBuilder.setAmount(dropInAmount);
+        if(amount > 0) {
+          Amount dropInAmount = new Amount();
+          dropInAmount.setCurrency(currencyCode);
+          dropInAmount.setValue(amount);
+          dropInConfigurationBuilder.setAmount(dropInAmount);
+        }
 
         dropInConfigurationBuilder.setEnvironment("live".equals(environment) ? Environment.EUROPE : Environment.TEST);
         DropInConfiguration dropInConfiguration = dropInConfigurationBuilder.build();
