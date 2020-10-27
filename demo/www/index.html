@@ -74,14 +74,13 @@
         environment: "test", // or "live", default "test"
         currencyCode: "EUR",
         amount: 123, // in minor units (cents)
-        // note that this element is currently ignored
         paymentMethodsConfiguration: {
           card: {
             showStorePaymentField: false,
             holderNameRequired: true,
             publicKey: "10001|A5CC0B567192DE5B987C0001CD1DB28E10235333767600162D34BEA9796DA17DD1C8CAFE3AA56F3EC476F92467489982F4492E55AA483FBDEFD75EB23332E22107C058BA2EF124EBE33B47B8679C4DE65B422E606A4A22CD6E8B3BBED1DDF916553D8C15827FF01E333589482CE0F0BA98D2ACAAE2F6875117CBDDE1032F10A98464CEAFBBF146F41F160760651A2789C759CE460CB3B770D4721E6F11847C9FA448B1399D9BD12E0C6F02A985B8FDAD175F669D17AA8A5EA6584C725CB761227926F51D583FA857B9227437EBD9A933D526100825CEED0E9D642823669E6AB3C22EE5871C4DBCD0EF450449F97DB2C718A34FF94B74F76C51F507C7344123D9"
           },
-          applepay: {
+          applepay: { // Example required configuration for Apple Pay
             amount: 0,
             currencyCode: 'EUR',
             countryCode: 'DE',
@@ -91,7 +90,6 @@
             }
           },
           paywithgoogle: { // Example required configuration for Google Pay
-            environment: "TEST", // Change this to PRODUCTION when you're ready to accept live Google Pay payments
             configuration: {
               gatewayMerchantId: "merchant.com.adyen.foodji.test", // Your Adyen merchant or company account name
             }

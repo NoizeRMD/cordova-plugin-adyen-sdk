@@ -64,16 +64,17 @@ public class AdyenPlugin extends CordovaPlugin {
         dropInConfigurationBuilder.addSepaConfiguration(new SepaConfiguration.Builder(cordova.getContext()).build());
 
         if (paymentMethodsConfiguration.has("card")) {
-          CardConfiguration cardConfiguration = new CardConfiguration.Builder(cordova.getContext(), paymentMethodsConfiguration.getJSONObject("card").getString("publicKey"))
-              .setHolderNameRequire(paymentMethodsConfiguration.getJSONObject("card").getBoolean("holderNameRequired"))
-              .setShowStorePaymentField(paymentMethodsConfiguration.getJSONObject("card").getBoolean("showStorePaymentField"))
+          JSONObject card = paymentMethodsConfiguration.getJSONObject("card");
+          CardConfiguration cardConfiguration = new CardConfiguration.Builder(cordova.getContext(), card.getString("publicKey"))
+              .setHolderNameRequire(card.getBoolean("holderNameRequired"))
+              .setShowStorePaymentField(card.getBoolean("showStorePaymentField"))
               .build();
           dropInConfigurationBuilder.addCardConfiguration(cardConfiguration);
         }
 
         if (paymentMethodsConfiguration.has("paywithgoogle")) {
-          GooglePayConfiguration googlePayConfiguration = new GooglePayConfiguration.Builder(cordova.getContext(), paymentMethodsConfiguration.getJSONObject("paywithgoogle").getJSONObject("configuration").getString("gatewayMerchantId"))
-              .setEnvironment("live".equals(environment) ? Environment.EUROPE : Environment.TEST)
+          JSONObject paywithgoogle = paymentMethodsConfiguration.getJSONObject("paywithgoogle");
+          GooglePayConfiguration googlePayConfiguration = new GooglePayConfiguration.Builder(cordova.getContext(), paywithgoogle.getJSONObject("configuration").getString("gatewayMerchantId"))
               .build();
           dropInConfigurationBuilder.addGooglePayConfiguration(googlePayConfiguration);
         }

@@ -27,7 +27,7 @@ Other plugin methods can be invoked from the callback function `onSubmit` below.
     environment: "test", // or "live", default "test"
     currencyCode: "EUR",
     amount: 123, // in minor units (cents), so 123 in this case is "EUR 1,23"
-    paymentMethodsConfiguration: {}, // this element is currently ignored
+    paymentMethodsConfiguration: {}, // configuration for payment methods (like card, applepay, googlepay)
 
     onSubmit: function (state) { // called after the user picks a payment method from the list
       // while this function is processing, keep the drop-in open
