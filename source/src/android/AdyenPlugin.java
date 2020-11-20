@@ -8,9 +8,9 @@ import com.adyen.checkout.card.CardConfiguration;
 import com.adyen.checkout.core.api.Environment;
 import com.adyen.checkout.dropin.DropIn;
 import com.adyen.checkout.dropin.DropInConfiguration;
-import com.adyen.checkout.dropin.service.CallResult;
 import com.adyen.checkout.googlepay.GooglePayConfiguration;
 import com.adyen.checkout.sepa.SepaConfiguration;
+import com.google.android.gms.wallet.WalletConstants;
 
 import org.apache.cordova.*;
 import org.json.JSONException;
@@ -75,6 +75,7 @@ public class AdyenPlugin extends CordovaPlugin {
         if (paymentMethodsConfiguration.has("paywithgoogle")) {
           JSONObject paywithgoogle = paymentMethodsConfiguration.getJSONObject("paywithgoogle");
           GooglePayConfiguration googlePayConfiguration = new GooglePayConfiguration.Builder(cordova.getContext(), paywithgoogle.getJSONObject("configuration").getString("gatewayMerchantId"))
+              .setGooglePayEnvironment("live".equals(environment) ? WalletConstants.ENVIRONMENT_PRODUCTION : WalletConstants.ENVIRONMENT_TEST)
               .build();
           dropInConfigurationBuilder.addGooglePayConfiguration(googlePayConfiguration);
         }
