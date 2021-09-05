@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-adyen-sdk",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Cordova plugin for the Adyen SDK",
   "cordova": {
     "id": "cordova-plugin-adyen-sdk",
