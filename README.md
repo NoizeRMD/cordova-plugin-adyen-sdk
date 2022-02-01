@@ -23,11 +23,21 @@ Other plugin methods can be invoked from the callback function `onSubmit` below.
 
 ```js
   var options = {
+    clientKey: "clientKey",
     paymentMethodsResponse: {"paymentMethods":[]}, // the paymentMethods response from the server
     environment: "test", // or "live", default "test"
     currencyCode: "EUR",
-    amount: 123, // in minor units (cents), so 123 in this case is "EUR 1,23"
-    paymentMethodsConfiguration: {}, // configuration for payment methods (like card, applepay, googlepay)
+    amount: 250, // in minor units (cents), so 250 in this case is "EUR 2,50"
+    paymentMethodsConfiguration: {
+      applepay: {
+         countryCode,
+         amount: "2.50", // amount in string
+         configuration: {
+           merchantName: "Product name",
+           merchantIdentifier: "merchant.com.adyen.companyName.test"
+         }
+      },
+    }, // configuration for payment methods (like card, applepay, googlepay)
 
     onSubmit: function (state) { // called after the user picks a payment method from the list
       // while this function is processing, keep the drop-in open
