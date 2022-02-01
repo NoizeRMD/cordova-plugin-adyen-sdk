@@ -16,18 +16,19 @@ class AdyenPlugin: CDVPlugin {
 
         let environment: String = obj["environment"] as? String ?? "test"
         let paymentMethodsResponse: String = obj["paymentMethodsResponse"] as! String
+        let clientKey: String = obj["clientKey"] as! String
         let currencyCode: String = obj["currencyCode"] as! String
         let amount: Int = obj["amount"] as! Int
         var countryCode: String = "DE";
 
         self.commandDelegate.run(inBackground: {
             let configuration = DropInComponent.PaymentMethodsConfiguration()
+            configuration.clientKey = clientKey
 
             let paymentMethodsConfiguration: NSDictionary = obj["paymentMethodsConfiguration"] as! NSDictionary
 
             let card = paymentMethodsConfiguration["card"] as? NSDictionary
             if (card != nil) {
-                configuration.card.publicKey = card!["publicKey"] as? String
                 configuration.card.showsHolderNameField = card!["holderNameRequired"] as? Bool ?? false
                 configuration.card.showsStorePaymentMethodField = card!["showStorePaymentField"] as? Bool ?? true
             }
@@ -36,10 +37,11 @@ class AdyenPlugin: CDVPlugin {
             if (applePay != nil) {
                 countryCode = applePay!["countryCode"] as! String
                 let applePayConfig = applePay!["configuration"] as? NSDictionary
+                let totalAmount = applePay!["amount"] as? String ?? "0.0"
                 if (applePayConfig != nil) {
                     configuration.applePay.merchantIdentifier = applePayConfig!["merchantIdentifier"] as? String
                     configuration.applePay.summaryItems = [
-                        PKPaymentSummaryItem(label: applePayConfig!["merchantName"] as! String, amount: NSDecimalNumber(string: "0.0"), type: .pending)
+                        PKPaymentSummaryItem(label: applePayConfig!["merchantName"] as! String, amount: NSDecimalNumber(string: totalAmount), type: .pending)
                     ]
                 }
             }
